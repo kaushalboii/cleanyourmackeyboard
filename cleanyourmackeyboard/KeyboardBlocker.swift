@@ -108,6 +108,18 @@ class KeyboardBlocker: ObservableObject {
             if blocker.isLocked {
                 DispatchQueue.main.async {
                     blocker.blockedCount += 1
+                    
+                    // Register keypress visually even when blocked so the key lights up under the frost blur!
+                    if type == .keyDown || type == .flagsChanged {
+                        let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
+                        let uKeyCode = UInt16(keyCode)
+                        blocker.activePressedKeys.insert(uKeyCode)
+                        
+                        // Auto-fade key highlight
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                            blocker.activePressedKeys.remove(uKeyCode)
+                        }
+                    }
                 }
                 // Return nil to completely consume and block the event
                 return nil

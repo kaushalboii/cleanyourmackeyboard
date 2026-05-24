@@ -44,4 +44,4 @@ struct cleanyourmackeyboardApp: App {
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
     }
-}. 
+}

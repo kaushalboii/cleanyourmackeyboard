@@ -184,10 +184,10 @@ struct BackgroundGlowView: View {
             
             // Subtle pulsing accent spots
             Circle()
-                .fill(isLocked ? Color.amberGlow : Color.cyanGlow)
+                .fill(isLocked ? Color.white : Color.cyanGlow)
                 .frame(width: 250, height: 250)
                 .blur(radius: 80)
-                .opacity(isLocked ? 0.25 : 0.15)
+                .opacity(isLocked ? 0.20 : 0.15)
                 .offset(y: -40)
                 .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: isLocked)
         }
@@ -208,9 +208,9 @@ struct HeaderView: View {
             
             HStack(spacing: 8) {
                 Circle()
-                    .fill(isLocked ? Color.amber : Color.emerald)
+                    .fill(isLocked ? Color.white : Color.emerald)
                     .frame(width: 7, height: 7)
-                    .shadow(color: isLocked ? Color.amber : Color.emerald, radius: 4)
+                    .shadow(color: isLocked ? Color.white : Color.emerald, radius: 4)
                 
                 Text(isLocked ? "LOCK ACTIVE" : "UNLOCKED & READY")
                     .font(.system(size: 16, weight: .bold, design: .rounded))
@@ -302,49 +302,50 @@ struct LockedOverlayView: View {
     @State private var scalePulse = false
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(Color.black.opacity(0.85))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.amber.opacity(0.2), lineWidth: 1)
-            )
-            .overlay(
-                VStack(spacing: 12) {
-                    Image(systemName: "lock.shield.fill")
-                        .font(.system(size: 34))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [Color.amber, Color.red],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .scaleEffect(scalePulse ? 1.08 : 0.96)
-                        .shadow(color: Color.amber.opacity(0.5), radius: 8)
-                        .onAppear {
-                            withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-                                scalePulse = true
-                            }
-                        }
-                    
-                    VStack(spacing: 4) {
-                        Text("Cleaning Mode Enabled")
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
-                        
-                        if blockedCount > 0 {
-                            Text("Blocked \(blockedCount) accidental key presses")
-                                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                .foregroundColor(.amber)
-                                .transition(.opacity.combined(with: .scale))
-                        } else {
-                            Text("Safely wipe your keyboard now")
-                                .font(.system(size: 11, weight: .medium, design: .rounded))
-                                .foregroundColor(.white.opacity(0.4))
+        ZStack {
+            // Light glassmorphic blur overlay that keeps keys underneath visible!
+            VisualEffectView(material: .hudWindow, blendingMode: .withinWindow, state: .active)
+                .opacity(0.5) // Lightly translucent so keys are clearly visible under the blur!
+                .cornerRadius(16)
+            
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+            
+            VStack(spacing: 8) {
+                Spacer()
+                
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 24))
+                    .foregroundColor(.white)
+                    .scaleEffect(scalePulse ? 1.08 : 0.94)
+                    .shadow(color: Color.white.opacity(0.4), radius: 6)
+                    .onAppear {
+                        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                            scalePulse = true
                         }
                     }
+                
+                VStack(spacing: 3) {
+                    Text("Cleaning Mode Active")
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    
+                    if blockedCount > 0 {
+                        Text("Blocked \(blockedCount) keystrokes")
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Capsule().fill(Color.white.opacity(0.2)))
+                    } else {
+                        Text("Keyboard is locked • Keys are safe to clean")
+                            .font(.system(size: 10, weight: .medium, design: .rounded))
+                            .foregroundColor(.white.opacity(0.6))
+                    }
                 }
-            )
+                .padding(.bottom, 12)
+            }
+        }
     }
 }
 
@@ -364,7 +365,7 @@ struct LockButtonView: View {
                     .font(.system(size: 13, weight: .bold, design: .rounded))
                     .tracking(1)
             }
-            .foregroundColor(.white)
+            .foregroundColor(isLocked ? .black : .white)
             .padding(.vertical, 14)
             .padding(.horizontal, 28)
             .frame(maxWidth: .infinity)
@@ -373,12 +374,12 @@ struct LockButtonView: View {
                     if !isAccessibilityEnabled {
                         // Error/Warning style
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(LinearGradient(colors: [Color.red.opacity(0.7), Color.amber.opacity(0.7)], startPoint: .leading, endPoint: .trailing))
+                            .fill(LinearGradient(colors: [Color.red.opacity(0.7), Color.white.opacity(0.3)], startPoint: .leading, endPoint: .trailing))
                     } else if isLocked {
-                        // Locked Active style - Amber pulsating button
+                        // Locked Active style - Pulsing silver/white button
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(LinearGradient(colors: [Color.amber, Color.orange], startPoint: .topLeading, endPoint: .bottomTrailing))
-                            .shadow(color: Color.amber.opacity(isHovered ? 0.6 : 0.3), radius: 8)
+                            .fill(LinearGradient(colors: [Color.white, Color.white.opacity(0.85)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                            .shadow(color: Color.white.opacity(isHovered ? 0.4 : 0.2), radius: 8)
                     } else {
                         // Standard Unlocked ready style
                         RoundedRectangle(cornerRadius: 12)
@@ -408,7 +409,7 @@ struct AccessibilityPromptView: View {
         VStack(spacing: 12) {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "hand.raised.fill")
-                    .foregroundColor(.amber)
+                    .foregroundColor(.white)
                     .font(.system(size: 16))
                     .padding(.top, 2)
                 
@@ -431,13 +432,13 @@ struct AccessibilityPromptView: View {
                     Image(systemName: "arrow.up.right")
                         .font(.system(size: 9, weight: .bold))
                 }
-                .foregroundColor(.amber)
+                .foregroundColor(.white)
                 .padding(.vertical, 6)
                 .padding(.horizontal, 14)
                 .background(
                     Capsule()
-                        .stroke(Color.amber.opacity(0.4), lineWidth: 1)
-                        .background(Color.amber.opacity(hoverSettings ? 0.08 : 0.0))
+                        .stroke(Color.white.opacity(0.4), lineWidth: 1)
+                        .background(Color.white.opacity(hoverSettings ? 0.08 : 0.0))
                 )
                 .animation(.easeInOut(duration: 0.2), value: hoverSettings)
             }
@@ -450,7 +451,7 @@ struct AccessibilityPromptView: View {
                 .fill(Color.white.opacity(0.03))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.amber.opacity(0.15), lineWidth: 1)
+                        .stroke(Color.white.opacity(0.15), lineWidth: 1)
                 )
         )
     }
