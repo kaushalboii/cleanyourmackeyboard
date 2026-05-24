@@ -247,20 +247,20 @@ struct KeyCapView: View {
     var body: some View {
         Text(label)
             .font(.system(size: 8, weight: .bold, design: .rounded))
-            .foregroundColor(isPressed ? .black : .white.opacity(0.75))
+            .foregroundColor(isPressed ? .black : .white.opacity(0.85))
             .frame(width: width, height: 22)
             .background(
                 RoundedRectangle(cornerRadius: 4)
                     .fill(isPressed ?
-                          AnyShapeStyle(LinearGradient(colors: [.cyan, .blue], startPoint: .topLeading, endPoint: .bottomTrailing)) :
-                          AnyShapeStyle(Color.white.opacity(0.06)))
+                          AnyShapeStyle(Color.white) :
+                          AnyShapeStyle(Color.white.opacity(0.09)))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 4)
-                    .stroke(isPressed ? Color.cyan.opacity(0.8) : Color.white.opacity(0.04), lineWidth: 0.5)
+                    .stroke(isPressed ? Color.white : Color.white.opacity(0.16), lineWidth: 0.5)
             )
-            .shadow(color: isPressed ? Color.cyan.opacity(0.5) : Color.clear, radius: 4)
-            .animation(.easeOut(duration: 0.1), value: isPressed)
+            .shadow(color: isPressed ? Color.white.opacity(0.8) : Color.clear, radius: 5)
+            .animation(.easeOut(duration: 0.08), value: isPressed)
     }
 }
 
@@ -365,18 +365,19 @@ struct LockButtonView: View {
                     .font(.system(size: 13, weight: .bold, design: .rounded))
                     .tracking(1)
             }
-            .foregroundColor(isLocked ? .black : .white)
+            .foregroundColor(!isAccessibilityEnabled || isLocked ? .black : .white)
             .padding(.vertical, 14)
             .padding(.horizontal, 28)
             .frame(maxWidth: .infinity)
             .background(
                 ZStack {
                     if !isAccessibilityEnabled {
-                        // Error/Warning style
+                        // Clean Silver/White slab for accessibility grant button
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(LinearGradient(colors: [Color.red.opacity(0.7), Color.white.opacity(0.3)], startPoint: .leading, endPoint: .trailing))
+                            .fill(LinearGradient(colors: [Color.white, Color.white.opacity(0.9)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                            .shadow(color: Color.white.opacity(isHovered ? 0.3 : 0.15), radius: 6)
                     } else if isLocked {
-                        // Locked Active style - Pulsing silver/white button
+                        // Pulsing silver/white button when locked
                         RoundedRectangle(cornerRadius: 12)
                             .fill(LinearGradient(colors: [Color.white, Color.white.opacity(0.85)], startPoint: .topLeading, endPoint: .bottomTrailing))
                             .shadow(color: Color.white.opacity(isHovered ? 0.4 : 0.2), radius: 8)

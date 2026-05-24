@@ -109,15 +109,46 @@ class KeyboardBlocker: ObservableObject {
                 DispatchQueue.main.async {
                     blocker.blockedCount += 1
                     
+                    let rawType = type.rawValue
                     // Register keypress visually even when blocked so the key lights up under the frost blur!
-                    if type == .keyDown || type == .flagsChanged {
+                    if rawType == 10 || rawType == 12 { // keyDown or flagsChanged
                         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
                         let uKeyCode = UInt16(keyCode)
                         blocker.activePressedKeys.insert(uKeyCode)
                         
                         // Auto-fade key highlight
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                             blocker.activePressedKeys.remove(uKeyCode)
+                        }
+                    } else if rawType == 14 { // NX_SYSDEFINED (brightness, volume, playback hardware keys)
+                        if let nsEvent = NSEvent(cgEvent: event) {
+                            let subtype = nsEvent.subtype.rawValue
+                            if subtype == 8 { // Subtype 8 is media key events!
+                                let data = nsEvent.data1
+                                let keyCode = (data & 0xFFFF0000) >> 16
+                                let keyFlags = (data & 0x0000FFFF)
+                                let keyState = ((keyFlags & 0xFF00) >> 8) == 0xA // 0xA is keyDown, 0xB is keyUp
+                                
+                                var mappedCode: UInt16 = 0
+                                switch keyCode {
+                                case 0: mappedCode = 111  // F12 (Volume Up)
+                                case 1: mappedCode = 103  // F11 (Volume Down)
+                                case 7: mappedCode = 109  // F10 (Mute)
+                                case 3: mappedCode = 120  // F2 (Brightness Up)
+                                case 4: mappedCode = 122  // F1 (Brightness Down)
+                                case 16: mappedCode = 100 // F8 (Play/Pause)
+                                case 17: mappedCode = 98  // F7 (Rewind)
+                                case 18: mappedCode = 101 // F9 (Fast Forward)
+                                default: break
+                                }
+                                
+                                if mappedCode > 0 && keyState {
+                                    blocker.activePressedKeys.insert(mappedCode)
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                        blocker.activePressedKeys.remove(mappedCode)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
