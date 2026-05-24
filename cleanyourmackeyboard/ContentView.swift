@@ -260,6 +260,9 @@ struct KeyCapView: View {
     var body: some View {
         Text(label)
             .font(.system(size: 8, weight: .bold, design: .rounded))
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+            .padding(.horizontal, 1)
             .foregroundColor(isPressed ? .black : .white.opacity(0.85))
             .frame(width: width, height: 20)
             .background(
@@ -282,18 +285,18 @@ struct BottomRowView: View {
     
     var body: some View {
         HStack(spacing: 4) {
-            // Fn, Ctrl, Opt, Cmd (Left side)
+            // Fn, Ctrl, Opt, Cmd (Left side) - enlarged option & command
             KeyCapView(label: "fn", code: 63, width: 22)
-            KeyCapView(label: "control", code: 59, width: 34)
-            KeyCapView(label: "option", code: 58, width: 24)
-            KeyCapView(label: "command", code: 55, width: 30)
+            KeyCapView(label: "control", code: 59, width: 33)
+            KeyCapView(label: "option", code: 58, width: 31)
+            KeyCapView(label: "command", code: 55, width: 37)
             
             // Spacebar
-            KeyCapView(label: "", code: 49, width: 114)
+            KeyCapView(label: "", code: 49, width: 94)
             
-            // Cmd, Opt (Right side)
-            KeyCapView(label: "command", code: 54, width: 30)
-            KeyCapView(label: "option", code: 61, width: 24)
+            // Cmd, Opt (Right side) - enlarged option & command
+            KeyCapView(label: "command", code: 54, width: 37)
+            KeyCapView(label: "option", code: 61, width: 31)
             
             // Arrow keys block
             HStack(spacing: 3) {
