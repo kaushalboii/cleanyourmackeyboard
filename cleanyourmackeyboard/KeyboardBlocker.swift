@@ -22,6 +22,7 @@ class KeyboardBlocker: ObservableObject {
     }
     @Published var blockedCount: Int = 0
     @Published var activePressedKeys: Set<UInt16> = []
+    @Published var lastDebugCode: String = ""
     
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
@@ -113,7 +114,26 @@ class KeyboardBlocker: ObservableObject {
                     // Register keypress visually even when blocked so the key lights up under the frost blur!
                     if rawType == 10 || rawType == 12 { // keyDown or flagsChanged
                         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-                        let uKeyCode = UInt16(keyCode)
+                        var uKeyCode = UInt16(keyCode)
+                        
+                        // Map hardware/shortcut keycodes for F3..F6 on Apple Silicon keyboards
+                        if uKeyCode == 160 || uKeyCode == 131 {
+                            uKeyCode = 99  // F3 (Mission Control)
+                        } else if uKeyCode == 130 || uKeyCode == 177 {
+                            uKeyCode = 118 // F4 (Spotlight / Launchpad)
+                        } else if uKeyCode == 144 || uKeyCode == 184 || uKeyCode == 176 || uKeyCode == 145 {
+                            uKeyCode = 96  // F5 (Dictation / Mic)
+                        } else if uKeyCode == 178 {
+                            uKeyCode = 97  // F6 (Do Not Disturb)
+                        } else if uKeyCode == 179 {
+                            uKeyCode = 63  // fn / Globe key
+                        } else {
+                            // If we don't know the keycode, log it!
+                            DispatchQueue.main.async {
+                                blocker.lastDebugCode = "KEY:\(uKeyCode)"
+                            }
+                        }
+                        
                         blocker.activePressedKeys.insert(uKeyCode)
                         
                         // Auto-fade key highlight
@@ -122,34 +142,42 @@ class KeyboardBlocker: ObservableObject {
                         }
                     } else if rawType == 14 { // NX_SYSDEFINED (brightness, volume, playback hardware keys)
                         if let nsEvent = NSEvent(cgEvent: event) {
-                            // Extract event data regardless of subtype to capture all hardware and system shortcut variations
-                            let data = nsEvent.data1
-                            let keyCode = (data & 0xFFFF0000) >> 16
-                            let keyFlags = (data & 0x0000FFFF)
-                            let keyState = ((keyFlags & 0xFF00) >> 8) == 0xA // 0xA is keyDown, 0xB is keyUp
-                            
-                            var mappedCode: UInt16 = 0
+                            if nsEvent.subtype.rawValue == 8 {
+                                // Extract event data for AUX control buttons
+                                let data = nsEvent.data1
+                                let keyCode = (data & 0xFFFF0000) >> 16
+                                let keyFlags = (data & 0x0000FFFF)
+                                let keyState = ((keyFlags & 0xFF00) >> 8) == 0xA // 0xA is keyDown, 0xB is keyUp
+                                
+                                var mappedCode: UInt16 = 0
                             switch keyCode {
                             case 0: mappedCode = 111  // F12 (Volume Up)
                             case 1: mappedCode = 103  // F11 (Volume Down)
                             case 7: mappedCode = 109  // F10 (Mute)
-                            case 3: mappedCode = 122  // F1 (Brightness Down - corrected swap!)
-                            case 4: mappedCode = 120  // F2 (Brightness Up - corrected swap!)
+                            case 3: mappedCode = 122  // F1 (Brightness Down)
+                            case 2: mappedCode = 120  // F2 (Brightness Up)
                             case 13: mappedCode = 99  // F3 (Mission Control / Expose)
-                            case 21, 22, 30: mappedCode = 118 // F4 (Launchpad / Spotlight)
-                            case 25: mappedCode = 96  // F5 (Dictation / Mic)
-                            case 26: mappedCode = 97  // F6 (Do Not Disturb / Moon)
+                            case 30: mappedCode = 118 // F4 (Launchpad / Spotlight)
+                            case 22, 25: mappedCode = 96  // F5 (Dictation / Backlight Down)
+                            case 21, 26: mappedCode = 97  // F6 (Do Not Disturb / Backlight Up)
                             case 16: mappedCode = 100 // F8 (Play/Pause)
                             case 17, 19: mappedCode = 101 // F9 (Fast Forward / Next Track)
                             case 18, 20: mappedCode = 98  // F7 (Rewind / Previous Track)
-                            default: break
+                            default: 
+                                DispatchQueue.main.async {
+                                    blocker.lastDebugCode = "SYS:\(keyCode)"
+                                }
+                                break
                             }
                             
                             if mappedCode > 0 { // Remove keyState check for system defined triggers to let F2..F6 register visual feedback instantly
-                                blocker.activePressedKeys.insert(mappedCode)
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                    blocker.activePressedKeys.remove(mappedCode)
+                                    blocker.activePressedKeys.insert(mappedCode)
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                        blocker.activePressedKeys.remove(mappedCode)
+                                    }
                                 }
+                            } else {
+                                // Ignore non-AUX system events (like Caps Lock / Power which can falsely trigger F12)
                             }
                         }
                     }

@@ -110,7 +110,7 @@ struct ContentView: View {
             
             VStack(spacing: 12) {
                 // Header Block
-                HeaderView(isLocked: blocker.isLocked, blockedCount: blocker.blockedCount)
+                HeaderView(isLocked: blocker.isLocked, blockedCount: blocker.blockedCount, lastDebugCode: blocker.lastDebugCode)
                 
                 // Key Visualizer
                 ZStack {
@@ -198,6 +198,7 @@ struct BackgroundGlowView: View {
 struct HeaderView: View {
     var isLocked: Bool
     var blockedCount: Int
+    var lastDebugCode: String = ""
     
     var body: some View {
         VStack(spacing: 6) {
@@ -216,6 +217,12 @@ struct HeaderView: View {
                     .font(.system(size: 16, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
             }
+            
+            // if lastDebugCode != "" {
+            //     Text("[\(lastDebugCode)]")
+            //         .font(.system(size: 11, weight: .bold, design: .monospaced))
+            //         .foregroundColor(.yellow)
+            // }
         }
         .padding(.top, 8)
     }
@@ -270,7 +277,7 @@ struct BottomRowView: View {
     var body: some View {
         HStack(spacing: 4) {
             // Fn, Ctrl, Opt, Cmd (Left side)
-            KeyCapView(label: "fn", code: 999, width: 22) // Placeholders
+            KeyCapView(label: "fn", code: 63, width: 22)
             KeyCapView(label: "control", code: 59, width: 34)
             KeyCapView(label: "option", code: 58, width: 24)
             KeyCapView(label: "command", code: 55, width: 30)
