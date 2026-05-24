@@ -137,12 +137,12 @@ class KeyboardBlocker: ObservableObject {
                                 case 3: mappedCode = 122  // F1 (Brightness Down)
                                 case 4: mappedCode = 120  // F2 (Brightness Up)
                                 case 13: mappedCode = 99  // F3 (Mission Control / Expose)
-                                case 20, 21: mappedCode = 118 // F4 (Launchpad / Spotlight)
+                                case 21, 22, 30: mappedCode = 118 // F4 (Launchpad / Spotlight)
                                 case 25: mappedCode = 96  // F5 (Dictation / Mic)
-                                case 19: mappedCode = 97  // F6 (Do Not Disturb / Moon)
+                                case 26: mappedCode = 97  // F6 (Do Not Disturb / Moon)
                                 case 16: mappedCode = 100 // F8 (Play/Pause)
-                                case 17: mappedCode = 98  // F7 (Rewind)
-                                case 18: mappedCode = 101 // F9 (Fast Forward)
+                                case 17, 19: mappedCode = 101 // F9 (Fast Forward / Next Track)
+                                case 18, 20: mappedCode = 98  // F7 (Rewind / Previous Track - mapped correctly from 20!)
                                 default: break
                                 }
                                 
