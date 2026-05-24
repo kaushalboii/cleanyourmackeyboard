@@ -165,6 +165,12 @@ struct ContentView: View {
                         .foregroundColor(.white.opacity(0.35))
                         .padding(.top, 2)
                 }
+                
+                // Premium subtle creator signature
+                Text("Created by M Kàushal Maran")
+                    .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                    .foregroundColor(.white.opacity(0.18))
+                    .padding(.top, 4)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
