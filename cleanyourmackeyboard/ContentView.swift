@@ -108,13 +108,13 @@ struct ContentView: View {
             // Premium background gradient glow
             BackgroundGlowView(isLocked: blocker.isLocked)
             
-            VStack(spacing: 20) {
+            VStack(spacing: 12) {
                 // Header Block
                 HeaderView(isLocked: blocker.isLocked, blockedCount: blocker.blockedCount)
                 
                 // Key Visualizer
                 ZStack {
-                    VStack(spacing: 5) {
+                    VStack(spacing: 4) {
                         KeyRowView(keys: functionRow)
                         KeyRowView(keys: row1)
                         KeyRowView(keys: row2)
@@ -122,7 +122,7 @@ struct ContentView: View {
                         KeyRowView(keys: row4)
                         BottomRowView()
                     }
-                    .padding(15)
+                    .padding(10)
                     .background(
                         RoundedRectangle(cornerRadius: 16)
                             .fill(Color.black.opacity(0.4))
@@ -138,7 +138,7 @@ struct ContentView: View {
                             .transition(.opacity.combined(with: .scale(scale: 0.95)))
                     }
                 }
-                .frame(width: 380, height: 205)
+                .frame(width: 380, height: 182)
                 .animation(.spring(response: 0.4, dampingFraction: 0.8), value: blocker.isLocked)
                 
                 // Primary Control Button
@@ -163,11 +163,11 @@ struct ContentView: View {
                     Text("Use your Trackpad or Mouse to click and Unlock")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundColor(.white.opacity(0.35))
-                        .padding(.top, 4)
+                        .padding(.top, 2)
                 }
             }
-            .padding(.horizontal, 24)
-            .padding(.vertical, 24)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: blocker.isAccessibilityEnabled)
     }
@@ -248,7 +248,7 @@ struct KeyCapView: View {
         Text(label)
             .font(.system(size: 8, weight: .bold, design: .rounded))
             .foregroundColor(isPressed ? .black : .white.opacity(0.85))
-            .frame(width: width, height: 22)
+            .frame(width: width, height: 20)
             .background(
                 RoundedRectangle(cornerRadius: 4)
                     .fill(isPressed ?
@@ -287,9 +287,9 @@ struct BottomRowView: View {
                 KeyCapView(label: "◀", code: 123, width: 18)
                 VStack(spacing: 2) {
                     KeyCapView(label: "▲", code: 126, width: 18)
-                        .frame(height: 10)
+                        .frame(height: 9)
                     KeyCapView(label: "▼", code: 125, width: 18)
-                        .frame(height: 10)
+                        .frame(height: 9)
                 }
                 KeyCapView(label: "▶", code: 124, width: 18)
             }

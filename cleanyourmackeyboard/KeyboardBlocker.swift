@@ -122,35 +122,33 @@ class KeyboardBlocker: ObservableObject {
                         }
                     } else if rawType == 14 { // NX_SYSDEFINED (brightness, volume, playback hardware keys)
                         if let nsEvent = NSEvent(cgEvent: event) {
-                            let subtype = nsEvent.subtype.rawValue
-                            if subtype == 8 { // Subtype 8 is media key events!
-                                let data = nsEvent.data1
-                                let keyCode = (data & 0xFFFF0000) >> 16
-                                let keyFlags = (data & 0x0000FFFF)
-                                let keyState = ((keyFlags & 0xFF00) >> 8) == 0xA // 0xA is keyDown, 0xB is keyUp
-                                
-                                var mappedCode: UInt16 = 0
-                                switch keyCode {
-                                case 0: mappedCode = 111  // F12 (Volume Up)
-                                case 1: mappedCode = 103  // F11 (Volume Down)
-                                case 7: mappedCode = 109  // F10 (Mute)
-                                case 3: mappedCode = 122  // F1 (Brightness Down)
-                                case 4: mappedCode = 120  // F2 (Brightness Up)
-                                case 13: mappedCode = 99  // F3 (Mission Control / Expose)
-                                case 21, 22, 30: mappedCode = 118 // F4 (Launchpad / Spotlight)
-                                case 25: mappedCode = 96  // F5 (Dictation / Mic)
-                                case 26: mappedCode = 97  // F6 (Do Not Disturb / Moon)
-                                case 16: mappedCode = 100 // F8 (Play/Pause)
-                                case 17, 19: mappedCode = 101 // F9 (Fast Forward / Next Track)
-                                case 18, 20: mappedCode = 98  // F7 (Rewind / Previous Track - mapped correctly from 20!)
-                                default: break
-                                }
-                                
-                                if mappedCode > 0 && keyState {
-                                    blocker.activePressedKeys.insert(mappedCode)
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                        blocker.activePressedKeys.remove(mappedCode)
-                                    }
+                            // Extract event data regardless of subtype to capture all hardware and system shortcut variations
+                            let data = nsEvent.data1
+                            let keyCode = (data & 0xFFFF0000) >> 16
+                            let keyFlags = (data & 0x0000FFFF)
+                            let keyState = ((keyFlags & 0xFF00) >> 8) == 0xA // 0xA is keyDown, 0xB is keyUp
+                            
+                            var mappedCode: UInt16 = 0
+                            switch keyCode {
+                            case 0: mappedCode = 111  // F12 (Volume Up)
+                            case 1: mappedCode = 103  // F11 (Volume Down)
+                            case 7: mappedCode = 109  // F10 (Mute)
+                            case 3: mappedCode = 122  // F1 (Brightness Down - corrected swap!)
+                            case 4: mappedCode = 120  // F2 (Brightness Up - corrected swap!)
+                            case 13: mappedCode = 99  // F3 (Mission Control / Expose)
+                            case 21, 22, 30: mappedCode = 118 // F4 (Launchpad / Spotlight)
+                            case 25: mappedCode = 96  // F5 (Dictation / Mic)
+                            case 26: mappedCode = 97  // F6 (Do Not Disturb / Moon)
+                            case 16: mappedCode = 100 // F8 (Play/Pause)
+                            case 17, 19: mappedCode = 101 // F9 (Fast Forward / Next Track)
+                            case 18, 20: mappedCode = 98  // F7 (Rewind / Previous Track)
+                            default: break
+                            }
+                            
+                            if mappedCode > 0 { // Remove keyState check for system defined triggers to let F2..F6 register visual feedback instantly
+                                blocker.activePressedKeys.insert(mappedCode)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                    blocker.activePressedKeys.remove(mappedCode)
                                 }
                             }
                         }

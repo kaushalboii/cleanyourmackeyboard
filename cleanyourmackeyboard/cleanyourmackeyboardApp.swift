@@ -15,7 +15,7 @@ struct cleanyourmackeyboardApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(blocker)
-                .frame(width: 420, height: 515)
+                .frame(width: 420, height: 425)
                 .background(
                     VisualEffectView(material: .hudWindow, blendingMode: .withinWindow, state: .active)
                         .ignoresSafeArea()
