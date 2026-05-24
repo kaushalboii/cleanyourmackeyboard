@@ -2,7 +2,7 @@
 //  KeyboardBlocker.swift
 //  cleanyourmackeyboard
 //
-//  Created by Vishal rao on 25/05/26.
+//  Created by Kàushal on 25/05/26.
 //
 
 import Cocoa
