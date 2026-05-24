@@ -68,16 +68,24 @@ class KeyboardBlocker: ObservableObject {
     }
     
     func openAccessibilitySettings() {
-        // Trigger OS Accessibility prompt first (this makes our app appear in the Accessibility list)
-        checkAccessibility(prompt: true)
+        // Step 1: Try to show the native macOS Accessibility popup.
+        // This only works the FIRST time the app ever runs (no TCC entry yet).
+        // If TCC already has an entry (any previous session), popup is silently skipped.
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true as CFBoolean]
+        let trusted = AXIsProcessTrustedWithOptions(options as CFDictionary)
         
-        // Open the System Preferences directly to Privacy -> Accessibility
-        let urlString = "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
-        if let url = URL(string: urlString) {
-            NSWorkspace.shared.open(url)
-        } else {
-            let fallbackUrl = URL(string: "https://support.apple.com/guide/mac-help/allow-accessibility-apps-to-control-your-mac-mh43185/mac")!
-            NSWorkspace.shared.open(fallbackUrl)
+        DispatchQueue.main.async {
+            self.isAccessibilityEnabled = trusted
+        }
+        
+        // Step 2: Always open System Settings as a reliable fallback.
+        // Short delay lets the native popup (if shown) appear first before Settings comes up.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            guard !AXIsProcessTrusted() else { return } // Already trusted, skip
+            let urlString = "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+            if let url = URL(string: urlString) {
+                NSWorkspace.shared.open(url)
+            }
         }
     }
     
