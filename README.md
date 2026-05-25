@@ -1,8 +1,6 @@
-# CleanMacKeyboard ⌨️🛡️
+# <img width="45" height="45" alt="Gemini_Generated_Image_vuxpamvuxpamvuxp-removebg-preview" src="https://github.com/user-attachments/assets/2f6edc0c-0c9f-4916-9d54-eddafc64b6e3" /> CleanMacKeyboard ⌨️🛡️
 
 A modern, premium macOS utility that locks your keyboard so you can safely clean it without triggering accidental keypresses, system shortcuts, or media actions. It features an interactive, glassmorphic real-time keyboard visualizer designed to match Apple's modern keyboard layout.
-
-<img width="150" height="150" alt="Gemini_Generated_Image_vuxpamvuxpamvuxp-removebg-preview" src="https://github.com/user-attachments/assets/2f6edc0c-0c9f-4916-9d54-eddafc64b6e3" />
 
 ---
 
