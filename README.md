@@ -53,6 +53,12 @@ Because `CleanMacKeyboard` intercepts keystrokes globally, macOS requires **Acce
 4. Click **"Grant System Access"** in the app. The native macOS permission popup will appear, and the app will automatically list itself under **System Settings > Privacy & Security > Accessibility**.
 5. Enable the toggle next to **CleanMacKeyboard**, and you are ready to go!
 
+
+---
+Privacy Policy : 
+
+https://docs.google.com/document/d/1LldiIxqF2GX2la6t7PhM9ZdJ7vGsaQlW_t2T9ajBXl4/edit?usp=sharing
+
 ---
 
 ## 📄 License
