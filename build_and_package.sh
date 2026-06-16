@@ -54,9 +54,17 @@ cd - > /dev/null
 echo "✅ ZIP package created: ${ZIP_NAME}"
 
 echo "📦 Packaging app into DMG..."
-hdiutil create -volname "CleanMacKeyboard" -srcfolder "$BUILT_APP_PATH" -ov -format UDZO "${BUILD_DIR}/${DMG_NAME}"
+# Create a temp directory for DMG contents
+DMG_TEMP="$BUILD_DIR/dmg_temp"
+mkdir -p "$DMG_TEMP"
+cp -R "$BUILT_APP_PATH" "$DMG_TEMP/"
+# Create symbolic link to /Applications inside the DMG
+ln -s /Applications "$DMG_TEMP/Applications"
+
+hdiutil create -volname "CleanMacKeyboard" -srcfolder "$DMG_TEMP" -ov -format UDZO "${BUILD_DIR}/${DMG_NAME}"
 mv "${BUILD_DIR}/${DMG_NAME}" "./"
 echo "✅ DMG package created: ${DMG_NAME}"
+
 
 echo "=============================================================================="
 echo "🎉 Build & Packaging Successful!"

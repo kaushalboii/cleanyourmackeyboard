@@ -47,8 +47,16 @@ jobs:
       - name: Create DMG package (Alternative option for users)
         run: |
           BUILT_APP_PATH=$(find ./build_derived -name "CleanYourMacKeyboard.app" -type d | head -n 1)
-          hdiutil create -volname "CleanMacKeyboard" -srcfolder "$BUILT_APP_PATH" -ov -format UDZO "${{ github.workspace }}/CleanMacKeyboard.dmg"
+          # Create a temp directory for DMG contents
+          DMG_TEMP="${{ github.workspace }}/dmg_temp"
+          mkdir -p "$DMG_TEMP"
+          cp -R "$BUILT_APP_PATH" "$DMG_TEMP/"
+          # Create symbolic link to /Applications inside the DMG
+          ln -s /Applications "$DMG_TEMP/Applications"
+          
+          hdiutil create -volname "CleanMacKeyboard" -srcfolder "$DMG_TEMP" -ov -format UDZO "${{ github.workspace }}/CleanMacKeyboard.dmg"
           echo "✅ DMG package created at ${{ github.workspace }}/CleanMacKeyboard.dmg"
+
 
       - name: Create GitHub Release and Upload Assets
         uses: softprops/action-gh-release@v2
