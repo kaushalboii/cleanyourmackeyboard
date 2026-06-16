@@ -44,19 +44,31 @@ jobs:
           
           echo "✅ ZIP package created at ${{ github.workspace }}/CleanMacKeyboard.zip"
 
-      - name: Create DMG package (Alternative option for users)
+      - name: Create DMG package (with drag-to-Applications layout)
         run: |
           BUILT_APP_PATH=$(find ./build_derived -name "CleanYourMacKeyboard.app" -type d | head -n 1)
-          # Create a temp directory for DMG contents
-          DMG_TEMP="${{ github.workspace }}/dmg_temp"
-          mkdir -p "$DMG_TEMP"
-          cp -R "$BUILT_APP_PATH" "$DMG_TEMP/"
-          # Create symbolic link to /Applications inside the DMG
-          ln -s /Applications "$DMG_TEMP/Applications"
+          if [ -z "$BUILT_APP_PATH" ] || [ ! -d "$BUILT_APP_PATH" ]; then
+            echo "❌ Error: CleanYourMacKeyboard.app not found!"
+            exit 1
+          fi
           
-          hdiutil create -volname "CleanMacKeyboard" -srcfolder "$DMG_TEMP" -ov -format UDZO "${{ github.workspace }}/CleanMacKeyboard.dmg"
-          echo "✅ DMG package created at ${{ github.workspace }}/CleanMacKeyboard.dmg"
-
+          # Install create-dmg for a proper installer layout
+          brew install create-dmg
+          
+          # Create a professional installer DMG with drag-to-Applications layout
+          create-dmg \
+            --volname "CleanMacKeyboard" \
+            --volicon "$BUILT_APP_PATH/Contents/Resources/AppIcon.icns" \
+            --window-pos 200 120 \
+            --window-size 660 400 \
+            --icon-size 120 \
+            --icon "CleanYourMacKeyboard.app" 185 185 \
+            --hide-extension "CleanYourMacKeyboard.app" \
+            --app-drop-link 475 185 \
+            "${{ github.workspace }}/CleanMacKeyboard.dmg" \
+            "$BUILT_APP_PATH"
+          
+          echo "✅ Professional installer DMG created at ${{ github.workspace }}/CleanMacKeyboard.dmg"
 
       - name: Create GitHub Release and Upload Assets
         uses: softprops/action-gh-release@v2
@@ -69,3 +81,4 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
