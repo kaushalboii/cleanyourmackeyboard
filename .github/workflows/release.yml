@@ -55,10 +55,11 @@ jobs:
           # Install create-dmg for a proper installer layout
           brew install create-dmg
           
-          # Create a professional installer DMG with drag-to-Applications layout
+          # Create a professional installer DMG with drag-to-Applications layout and custom background
           create-dmg \
             --volname "CleanMacKeyboard" \
             --volicon "$BUILT_APP_PATH/Contents/Resources/AppIcon.icns" \
+            --background "${{ github.workspace }}/dmg_background.png" \
             --window-pos 200 120 \
             --window-size 660 400 \
             --icon-size 120 \
