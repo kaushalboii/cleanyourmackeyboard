@@ -413,7 +413,7 @@ struct LockButtonView: View {
         }
         .buttonStyle(.plain)
         .onHover { hovering in
-            isHovered = hovering
+            self.isHovered = hovering
         }
     }
 }
@@ -460,7 +460,7 @@ struct AccessibilityPromptView: View {
                 .animation(.easeInOut(duration: 0.2), value: hoverSettings)
             }
             .buttonStyle(.plain)
-            .onHover { hoverSettings = $0 }
+            .onHover { self.hoverSettings = $0 }
         }
         .padding(14)
         .background(

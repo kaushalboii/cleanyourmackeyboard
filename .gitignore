@@ -1,0 +1,17 @@
+# OS X
+.DS_Store
+
+# Xcode / Build Outputs
+build/
+Build/
+build_derived/
+build_output/
+DerivedData/
+*.moved-aside
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.build/
