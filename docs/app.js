@@ -204,6 +204,43 @@ function initKeyboardSimulator() {
 
   mockupLockBtn.addEventListener('click', toggleLock);
 
+  // Screen Touch / Click Interaction on Virtual Keys
+  mockupKeyboard.querySelectorAll('.key').forEach(keyEl => {
+    const handleStart = (e) => {
+      e.preventDefault(); // Prevent text selection and zoom
+      if (isLocked) {
+        blockedCount++;
+        if (blockedCountText) {
+          blockedCountText.textContent = `Blocked ${blockedCount} keystrokes`;
+        }
+        if (lockIconContainer) {
+          lockIconContainer.classList.remove('pulse');
+          void lockIconContainer.offsetWidth; // Trigger reflow
+          lockIconContainer.classList.add('pulse');
+          setTimeout(() => lockIconContainer.classList.remove('pulse'), 120);
+        }
+      } else {
+        keyEl.classList.add('active');
+      }
+    };
+
+    const handleEnd = () => {
+      if (!isLocked) {
+        keyEl.classList.remove('active');
+      }
+    };
+
+    // Mouse events
+    keyEl.addEventListener('mousedown', handleStart);
+    keyEl.addEventListener('mouseup', handleEnd);
+    keyEl.addEventListener('mouseleave', handleEnd);
+
+    // Touch events for mobile/tablet screens
+    keyEl.addEventListener('touchstart', handleStart, { passive: false });
+    keyEl.addEventListener('touchend', handleEnd, { passive: true });
+    keyEl.addEventListener('touchcancel', handleEnd, { passive: true });
+  });
+
   // Keyboard Event Handlers
   window.addEventListener('keydown', (e) => {
     // Skip if focus is on interactive inputs
